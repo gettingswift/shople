@@ -1,0 +1,340 @@
+<!doctype html>
+<html lang="en-GB">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#111111">
+  <meta name="description" content="Shople — five UK supermarket price guesses every day.">
+  <title>Shople — Can you guess the price?</title>
+  <style>
+    :root{--bg:#f5f2ea;--ink:#171717;--muted:#706d66;--card:#fffdf8;--line:#ded8ca;--accent:#111;--good:#176b43;--bad:#9b2f2f;--gold:#b88924;--shadow:0 18px 60px rgba(20,18,10,.08)}
+    *{box-sizing:border-box}
+    html{scroll-behavior:smooth}
+    body{margin:0;background:var(--bg);color:var(--ink);font-family:ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+    button,input{font:inherit}
+    button{cursor:pointer}
+    .wrap{max-width:1000px;margin:0 auto;padding:0 22px}
+    header{padding:28px 0 18px;display:flex;align-items:center;justify-content:space-between;gap:18px}
+    .brand{font-weight:950;letter-spacing:-.06em;font-size:30px}
+    .nav{display:flex;gap:8px}
+    .nav button{border:1px solid var(--line);background:transparent;padding:9px 13px;border-radius:999px;font-size:13px;color:#3e3b35}
+    .nav button.active{background:var(--ink);color:#fff;border-color:var(--ink)}
+    main{padding:34px 0 70px}
+    .hero{display:grid;grid-template-columns:1.25fr .75fr;gap:22px;align-items:stretch}
+    .hero-card,.streak-card,.game-card,.result-card,.info-card{background:var(--card);border:1px solid var(--line);border-radius:28px;box-shadow:var(--shadow)}
+    .hero-card{padding:38px}
+    .eyebrow{text-transform:uppercase;letter-spacing:.16em;font-size:11px;font-weight:850;color:var(--muted)}
+    h1{font-size:clamp(44px,8vw,76px);line-height:.92;letter-spacing:-.07em;margin:13px 0 18px;max-width:700px}
+    .hero-copy{font-size:18px;line-height:1.5;color:#555148;max-width:620px}
+    .cta{margin-top:26px;border:0;border-radius:999px;background:var(--ink);color:#fff;padding:14px 20px;font-weight:800}
+    .streak-card{padding:28px;display:flex;flex-direction:column;justify-content:space-between}
+    .streak-num{font-size:58px;font-weight:950;letter-spacing:-.06em}
+    .streak-label{font-weight:800}
+    .meta{color:var(--muted);font-size:13px;line-height:1.5}
+    .game{margin-top:22px}
+    .game-card{padding:28px}
+    .progress{display:flex;justify-content:space-between;gap:12px;align-items:center;margin-bottom:25px}
+    .progress-text{font-size:13px;color:var(--muted);font-weight:750}
+    .dots{display:flex;gap:7px}
+    .dot{width:9px;height:9px;border-radius:50%;background:#d5cec0}
+    .dot.done{background:var(--ink)}
+    .dot.current{outline:3px solid #d8c7a3}
+    .location-line{display:flex;align-items:center;gap:8px;color:var(--muted);font-size:14px;margin-bottom:12px}
+    .store{font-weight:900;color:var(--ink)}
+    .product-name{font-size:clamp(28px,5vw,46px);line-height:1.03;letter-spacing:-.05em;font-weight:950;margin:6px 0 8px}
+    
+    .pack{font-size:16px;color:var(--muted)}
+    .pricing-context{margin-top:16px;display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+    .price-badge{display:inline-flex;align-items:center;gap:7px;border-radius:999px;padding:8px 11px;font-size:12px;font-weight:900;border:1px solid var(--line);background:#f6f1e7}
+    .price-badge.loyalty{background:#171717;color:#fff;border-color:#171717}
+    .price-badge.standard{background:#fff;border-color:var(--line);color:#4b473f}
+    .price-note{font-size:12px;color:var(--muted)}
+    .guess{margin-top:30px;display:flex;gap:10px;max-width:540px}
+    .price-input{flex:1;min-width:0;border:1px solid var(--line);background:#fff;border-radius:16px;padding:16px 18px;font-size:24px;font-weight:850;outline:none}
+    .price-input:focus{border-color:#9d947f;box-shadow:0 0 0 4px #eee7d9}
+    .submit{border:0;background:var(--ink);color:white;border-radius:16px;padding:0 22px;font-weight:900}
+    .micro{margin-top:11px;color:#8b8579;font-size:12px}
+    .result-card{margin-top:14px;padding:24px;display:none}
+    .result-card.show{display:block}
+    .result-top{display:flex;justify-content:space-between;gap:20px;align-items:flex-start}
+    .result-title{font-size:22px;font-weight:900;letter-spacing:-.03em}
+    .actual{font-size:40px;font-weight:950;letter-spacing:-.05em}
+    .delta{font-size:15px;font-weight:800;margin-top:4px}
+    .good{color:var(--good)} .bad{color:var(--bad)}
+    .scoreline{margin-top:18px;border-top:1px solid var(--line);padding-top:16px;display:flex;justify-content:space-between;gap:16px;font-size:13px;color:var(--muted)}
+    .score{font-size:24px;color:var(--ink);font-weight:950}
+    .next{margin-top:20px;border:1px solid var(--line);background:transparent;padding:11px 15px;border-radius:12px;font-weight:850}
+    .finish{display:none;margin-top:14px;padding:32px}
+    .finish.show{display:block}
+    .finish h2{font-size:44px;letter-spacing:-.06em;line-height:.95;margin:8px 0 10px}
+    .total-score{font-size:62px;font-weight:950;letter-spacing:-.07em}
+    .breakdown{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin-top:22px}
+    .mini{background:#f2eee5;border:1px solid #e5dfd2;border-radius:16px;padding:12px}
+    .mini-num{font-size:20px;font-weight:900}.mini-label{font-size:11px;color:var(--muted);margin-top:3px}
+    .info{display:none;margin-top:22px;grid-template-columns:1fr 1fr;gap:16px}
+    .info.show{display:grid}
+    .info-card{padding:28px}
+    .info-card h3{font-size:21px;margin:0 0 10px;letter-spacing:-.03em}
+    .info-card p{color:#59554c;line-height:1.6;margin:0 0 12px}
+    .source-list{font-size:13px;line-height:1.65;color:#5f5a50}
+    .source-list a{color:var(--ink);font-weight:800}
+    .tiny{font-size:11px;color:#8a8478}
+    footer{padding:28px 0 60px;color:#898276;font-size:12px}
+    @media(max-width:760px){.hero{grid-template-columns:1fr}.hero-card{padding:28px}.game-card{padding:22px}.guess{flex-direction:column}.submit{padding:15px}.info.show{grid-template-columns:1fr}.breakdown{grid-template-columns:repeat(2,1fr)}.result-top{flex-direction:column}.streak-card{min-height:180px}}
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <div class="brand">shople.</div>
+      <div class="nav">
+        <button id="playTab" class="active">Play</button>
+        <button id="aboutTab">About</button>
+      </div>
+    </header>
+
+    <main>
+      <section id="playView">
+        <div class="hero">
+          <div class="hero-card">
+            <div class="eyebrow">Daily UK price game</div>
+            <h1>How well do you know the weekly shop?</h1>
+            <div class="hero-copy">Five random supermarket products. Five price guesses. One score. Your daily questions are fixed for the day, so you can come back tomorrow for a fresh round.</div>
+            <button class="cta" id="startBtn">Start today's five</button>
+          </div>
+          <div class="streak-card">
+            <div>
+              <div class="eyebrow">Your streak</div>
+              <div class="streak-num" id="streakNum">0</div>
+              <div class="streak-label">days played</div>
+            </div>
+            <div class="meta" id="todayMeta">September 2026 price snapshot</div>
+          </div>
+        </div>
+
+        <div class="game" id="gameArea" hidden>
+          <div class="game-card">
+            <div class="progress">
+              <div class="progress-text" id="progressText">Question 1 of 5</div>
+              <div class="dots" id="dots"></div>
+            </div>
+            <div class="location-line"><span class="store" id="retailer"></span><span>·</span><span id="location"></span></div>
+            <div class="product-name" id="productName"></div>
+            <div class="pack" id="packSize"></div>
+            <div class="pricing-context" id="pricingContext"></div>
+            <form class="guess" id="guessForm">
+              <input class="price-input" id="guessInput" type="number" inputmode="decimal" min="0" step="0.01" placeholder="£ 0.00" aria-label="Your price guess">
+              <button class="submit" type="submit">Lock in guess</button>
+            </form>
+            <div class="micro">Guess the price shown for this pricing condition. Some products have both a standard price and a loyalty-card price.</div>
+          </div>
+          <div class="result-card" id="resultCard">
+            <div class="result-top">
+              <div>
+                <div class="eyebrow">Actual price</div>
+                <div class="actual" id="actualPrice"></div>
+                <div class="delta" id="deltaText"></div>
+                <div class="pricing-context" id="resultPricingContext"></div>
+              </div>
+              <div style="text-align:right"><div class="eyebrow">Round score</div><div class="score" id="roundScore"></div></div>
+            </div>
+            <div class="scoreline"><span id="sourceHint"></span><span id="runningScore">0 / 5,000</span></div>
+            <button class="next" id="nextBtn">Next question</button>
+          </div>
+          <div class="hero-card finish" id="finishCard">
+            <div class="eyebrow">Today's result</div>
+            <h2 id="finishTitle">Done.</h2>
+            <div class="total-score" id="totalScore">0</div>
+            <div class="meta">out of 5,000 possible points</div>
+            <div class="breakdown" id="breakdown"></div>
+            <button class="cta" id="replayInfoBtn">See how Shople works</button>
+          </div>
+        </div>
+      </section>
+
+      <section class="info" id="aboutView">
+        <div class="info-card">
+          <div class="eyebrow">The rules</div>
+          <h3>Five questions every day.</h3>
+          <p>Shople takes a verified food product from a UK supermarket, adds a random UK location as part of the question, and asks you to guess the displayed price. Where a retailer publishes a loyalty price, the question can be either the standard price or the loyalty-card price.</p>
+          <p>The five questions are generated deterministically from the date, so everyone gets the same daily set. Scoring rewards accuracy. An exact guess gets 1,000 points; the score falls as your guess moves further from the actual price.</p>
+        </div>
+        <div class="info-card">
+          <div class="eyebrow">Data model</div>
+          <h3>September 2026 only.</h3>
+          <p>The current build is deliberately a fixed September 2026 dataset. The database is kept in a standalone <code>data.js</code> file so you can manually replace prices each year without changing the game.</p>
+          <p class="tiny">Retailer online prices can differ from in-store prices, and promotions or stock can change. Location is therefore a gameplay label unless store-specific pricing is available from the source.</p>
+          <div class="source-list" id="sourceList"></div>
+        </div>
+      </section>
+    </main>
+    <footer>Shople · September 2026 snapshot · Built as a static site with local browser storage for progress.</footer>
+  </div>
+
+  <script src="data.js"></script>
+  <script>
+    const DATA = SHOPLE_DATA;
+    const QUESTIONS = 5;
+    const MAX_SCORE = 1000;
+    const today = new Date().toISOString().slice(0,10);
+    const stateKey = 'shople-state-v1';
+
+    const $ = (id) => document.getElementById(id);
+    const playTab = $('playTab'), aboutTab = $('aboutTab'), playView = $('playView'), aboutView = $('aboutView');
+    const gameArea = $('gameArea'), startBtn = $('startBtn'), guessForm = $('guessForm'), guessInput = $('guessInput');
+    const resultCard = $('resultCard'), nextBtn = $('nextBtn'), finishCard = $('finishCard');
+
+    function loadState(){
+      try { return JSON.parse(localStorage.getItem(stateKey) || '{}'); } catch { return {}; }
+    }
+    function saveState(s){ localStorage.setItem(stateKey, JSON.stringify(s)); }
+    let appState = loadState();
+    if(typeof appState.streak !== 'number') appState.streak = 0;
+
+    function seededRandom(seed){
+      let t = seed >>> 0;
+      return () => { t += 0x6D2B79F5; let r = Math.imul(t ^ t >>> 15, 1 | t); r ^= r + Math.imul(r ^ r >>> 7, 61 | r); return ((r ^ r >>> 14) >>> 0) / 4294967296; };
+    }
+    function hashDate(dateStr){
+      let h = 2166136261;
+      for(let i=0;i<dateStr.length;i++){ h ^= dateStr.charCodeAt(i); h = Math.imul(h, 16777619); }
+      return h >>> 0;
+    }
+    function money(n){ return '£' + n.toFixed(2); }
+    function scoreGuess(guess, actual){
+      const diff = Math.abs(guess - actual);
+      const ratio = Math.min(diff / Math.max(actual, 1), 2);
+      return Math.max(0, Math.round(MAX_SCORE * Math.pow(1 - ratio, 2)));
+    }
+    function generateDaily(){
+      const r = seededRandom(hashDate(DATA.snapshotDate + ':' + today));
+      const pool = [...DATA.products];
+      const out = [];
+      while(out.length < QUESTIONS && pool.length){
+        const idx = Math.floor(r() * pool.length);
+        const base = pool.splice(idx,1)[0];
+        const q = {...base, location: DATA.locations[Math.floor(r()*DATA.locations.length)]};
+        // For products with both prices, the daily question deterministically chooses
+        // either the standard price or the named loyalty-card price.
+        if(q.hasLoyaltyPrice && Number.isFinite(q.loyaltyPrice)){
+          q.requiresLoyalty = r() < 0.5;
+          q.questionPrice = q.requiresLoyalty ? q.loyaltyPrice : q.price;
+        } else {
+          q.requiresLoyalty = false;
+          q.questionPrice = q.price;
+        }
+        out.push(q);
+      }
+      return out;
+    }
+
+    let session = {questions: generateDaily(), index:0, scores:[], guesses:[], locked:false};
+
+    function renderDots(){
+      $('dots').innerHTML = session.questions.map((_,i)=>`<span class="dot ${i < session.index ? 'done':''} ${i===session.index ? 'current':''}"></span>`).join('');
+    }
+    function renderQuestion(){
+      const q = session.questions[session.index];
+      $('progressText').textContent = `Question ${session.index+1} of ${QUESTIONS}`;
+      $('retailer').textContent = q.retailer;
+      $('location').textContent = q.location;
+      $('productName').textContent = q.product;
+      $('packSize').textContent = q.pack;
+      const pricingContext = $('pricingContext');
+      if(q.requiresLoyalty){
+        pricingContext.innerHTML = `<span class="price-badge loyalty">With ${q.loyaltyCard}</span><span class="price-note">Use the loyalty-card price.</span>`;
+      } else if(q.hasLoyaltyPrice){
+        pricingContext.innerHTML = `<span class="price-badge standard">Without ${q.loyaltyCard}</span><span class="price-note">Use the standard price.</span>`;
+      } else {
+        pricingContext.innerHTML = `<span class="price-badge standard">Standard price</span><span class="price-note">No loyalty-card price in this record.</span>`;
+      }
+      guessInput.value='';
+      resultCard.classList.remove('show');
+      session.locked=false;
+      nextBtn.textContent = session.index === QUESTIONS-1 ? 'Finish today' : 'Next question';
+      renderDots();
+      setTimeout(()=>guessInput.focus(),30);
+    }
+    function startGame(){
+      session = {questions: generateDaily(), index:0, scores:[], guesses:[], locked:false};
+      finishCard.classList.remove('show');
+      gameArea.hidden=false;
+      startBtn.textContent='Restart today';
+      renderQuestion();
+      gameArea.scrollIntoView({behavior:'smooth',block:'start'});
+    }
+
+    function lockGuess(e){
+      e.preventDefault();
+      if(session.locked) return;
+      const guess = Number(guessInput.value);
+      if(!Number.isFinite(guess) || guess < 0) return;
+      const q = session.questions[session.index];
+      const actual = q.questionPrice;
+      const points = scoreGuess(guess, actual);
+      session.locked=true;
+      session.guesses[session.index]=guess;
+      session.scores[session.index]=points;
+      $('actualPrice').textContent = money(actual);
+      const diff = guess - actual;
+      const abs = Math.abs(diff);
+      $('deltaText').textContent = abs < 0.005 ? 'Perfect guess.' : (diff > 0 ? `${money(abs)} too high` : `${money(abs)} too low`);
+      $('deltaText').className='delta ' + (abs < Math.max(actual*0.05,0.10) ? 'good' : 'bad');
+      $('resultPricingContext').innerHTML = q.requiresLoyalty
+        ? `<span class="price-badge loyalty">${q.loyaltyCard} price</span>`
+        : `<span class="price-badge standard">Standard price${q.hasLoyaltyPrice ? ` · no ${q.loyaltyCard}` : ''}</span>`;
+      $('roundScore').textContent = points.toLocaleString();
+      const running = session.scores.reduce((a,b)=>a+(b||0),0);
+      $('runningScore').textContent = `${running.toLocaleString()} / 5,000`;
+      $('sourceHint').innerHTML = `<a href="${q.source}" target="_blank" rel="noopener">View retailer source</a>`;
+      resultCard.classList.add('show');
+      resultCard.scrollIntoView({behavior:'smooth',block:'nearest'});
+    }
+
+    function nextQuestion(){
+      if(!session.locked) return;
+      if(session.index < QUESTIONS-1){ session.index++; renderQuestion(); return; }
+      finishDay();
+    }
+
+    function finishDay(){
+      const total = session.scores.reduce((a,b)=>a+b,0);
+      const previousCompleted = appState.completedDate === today;
+      if(!previousCompleted){
+        const yesterday = new Date(); yesterday.setDate(yesterday.getDate()-1); const yd = yesterday.toISOString().slice(0,10);
+        appState.streak = appState.completedDate === yd ? appState.streak + 1 : 1;
+        appState.completedDate = today;
+        appState.lastScore = total;
+        appState.todayScores = session.scores;
+        saveState(appState);
+      }
+      $('totalScore').textContent = total.toLocaleString();
+      $('finishTitle').textContent = total >= 4500 ? 'Supermarket oracle.' : total >= 3500 ? 'Strong shop knowledge.' : total >= 2500 ? 'Decent estimate.' : 'The receipt won today.';
+      $('breakdown').innerHTML = session.scores.map((s,i)=>`<div class="mini"><div class="mini-num">${s.toLocaleString()}</div><div class="mini-label">Q${i+1}</div></div>`).join('');
+      finishCard.classList.add('show');
+      $('streakNum').textContent = appState.streak;
+      finishCard.scrollIntoView({behavior:'smooth',block:'nearest'});
+    }
+
+    function showAbout(){
+      playTab.classList.remove('active'); aboutTab.classList.add('active'); playView.style.display='none'; aboutView.classList.add('show');
+    }
+    function showPlay(){
+      aboutTab.classList.remove('active'); playTab.classList.add('active'); aboutView.classList.remove('show'); playView.style.display='block';
+    }
+
+    playTab.onclick=showPlay; aboutTab.onclick=showAbout; startBtn.onclick=startGame; guessForm.onsubmit=lockGuess; nextBtn.onclick=nextQuestion;
+    $('replayInfoBtn').onclick=showAbout;
+
+    const dayFmt = new Intl.DateTimeFormat('en-GB',{day:'numeric',month:'long',year:'numeric'});
+    $('todayMeta').textContent = `${dayFmt.format(new Date(today))} · ${DATA.products.length} products · ${new Set(DATA.products.map(p=>p.retailer)).size} retailers`;
+    $('streakNum').textContent = appState.streak || 0;
+    $('sourceList').innerHTML = `Sources include official retailer pages for Aldi, ASDA, Co-op, Iceland, Lidl, Morrisons, Sainsbury's, Tesco and Waitrose. Loyalty-card pricing is explicitly labelled as <strong>Tesco Clubcard</strong>, <strong>Nectar</strong>, <strong>Co-op Member Card</strong> or <strong>Lidl Plus</strong> where both prices were captured.`;
+
+    // Resume a completed game for today's date only, without revealing answers.
+    if(appState.completedDate === today){
+      startBtn.textContent='Play today again';
+    }
+  </script>
+</body>
+</html>
