@@ -1,49 +1,25 @@
 # Shople
 
-A static daily UK supermarket price-guessing game.
+A daily UK supermarket price-guessing game.
 
-## Run it
+## Current snapshot
 
-Open `index.html` in a modern browser, or serve the folder with any static web server:
+September 2026 only.
 
-```bash
-python3 -m http.server 8000
-```
+## Features
 
-Then open `http://localhost:8000`.
+- Five deterministic questions per day
+- Standard vs loyalty-price questions
+- Explicit loyalty-card requirement (Tesco Clubcard, Nectar, Co-op Member Card, Lidl Plus, etc.)
+- 5,000 points per question / 25,000 total
+- Daily streaks and local personal statistics
+- Shareable score links
+- Retailer source link on every revealed answer
+- Static deployment: GitHub → Vercel
+- Standalone `data.js` so annual price updates do not require changing game logic
 
-## Current September 2026 dataset
+See `GITHUB-SETUP.md` for deployment instructions.
 
-The game uses a fixed September 2026 food-price snapshot with:
 
-- 176 product records
-- 9 retailers: Aldi, ASDA, Co-op, Iceland, Lidl, Morrisons, Sainsbury's, Tesco and Waitrose
-- 20 UK gameplay locations
-- 61 records with both standard and loyalty-card prices
-- Loyalty-card pricing explicitly labelled as Tesco Clubcard, Nectar, Co-op Member Card or Lidl Plus
-
-The location is part of the game question. Unless the source is store-specific, it should not be interpreted as proof that the displayed price came from a particular branch.
-
-## Pricing schema
-
-Each product uses:
-
-- `price` — standard price
-- `hasLoyaltyPrice` — whether a separate loyalty price is available
-- `loyaltyPrice` — loyalty-card price when available
-- `loyaltyCard` — exact card/app name
-- `priceType` — `standard` or `standard_and_loyalty`
-- `snapshotDate` / `verified` — date of the price snapshot/check
-- `source` — source page for the captured price
-
-For products with both prices, the daily game deterministically chooses either the standard price or the loyalty price. The question tells the player which one to use.
-
-## Annual updates
-
-For the next annual refresh, update `data.js` and `prices-2026-09.csv` with the new snapshot. Keep the same field structure so the game logic does not need to change.
-
-Do not invent historical prices. Store only prices you have sourced and dated.
-
-## Pricing note
-
-Retailer online prices, promotions, eligibility and stock can change. Some loyalty prices require the retailer's membership/account/app. Lidl records in this snapshot were sourced from late-August 2026 pages immediately before the September launch and are labelled with their source check date.
+## Price location policy
+Shople intentionally does not invent branch or regional prices. Each question uses the retailer/product price stored in the September 2026 snapshot. A location is not shown unless a future dataset contains a verifiable store-specific price. Loyalty questions explicitly name the required card (for example Tesco Clubcard, Sainsbury's Nectar, Co-op Member Card or Lidl Plus).

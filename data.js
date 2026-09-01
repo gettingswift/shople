@@ -5,28 +5,6 @@ const SHOPLE_DATA = {
   "snapshotDate": "2026-09-01",
   "snapshotLabel": "September 2026",
   "note": "Expanded September 2026 food price snapshot. Loyalty entries explicitly identify the card required. Some Lidl sources were live in late August immediately before the September snapshot.",
-  "locations": [
-    "Swansea",
-    "Bristol",
-    "London",
-    "Manchester",
-    "Glasgow",
-    "Cardiff",
-    "Leeds",
-    "Birmingham",
-    "Liverpool",
-    "Edinburgh",
-    "Newcastle",
-    "Nottingham",
-    "Sheffield",
-    "Belfast",
-    "Oxford",
-    "Cambridge",
-    "Brighton",
-    "Plymouth",
-    "Reading",
-    "Aberdeen"
-  ],
   "products": [
     {
       "id": "aldi-bananas-5",
